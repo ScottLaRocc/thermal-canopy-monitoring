@@ -1,7 +1,7 @@
 # Project Overview
 This repository documents the design and implementation of a thermal imagery data acquisition system for forest canopy research, deployed at the Tambopata National Reserve AndesFlux PE-TNR tower. 
 
-The system utilizes a Raspberry Pi to coordinate data collection, storage, and cloud syncing across sensors including a FLIR A615 thermal camera, Phytos 31 leaf wetness sensor, SHT31 temperature and humidty sensors, and a thermistor-based temperature reference panel controlled by a Campbell CR310 data logger. 
+The system utilizes a Raspberry Pi to coordinate data collection, storage, and cloud syncing across sensors including a FLIR A615 thermal camera, Phytos 31 leaf wetness sensor, SHT31 temperature and humidty sensors, and a thermistor-based temperature reference panel. 
 
 This repository provides documentation of the system's hardware and software architecture, testing protocols, and data processing protocols. It is intended to support the reproducibility, maintenance, and adaptation of the system for environmental monitoring and ecological research.
 
