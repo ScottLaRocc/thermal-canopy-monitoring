@@ -39,42 +39,42 @@ The following table summarizes the hardware components connected to the Raspberr
         PHYTOS31 
 
 ## 3. Software Architecture 
-Raspberry Pi 5
-│
-├── /home/scott/
-│   ├── field-logger/
+Raspberry Pi 5    
+│    
+├── /home/scott/    
+│   ├── field-logger/    
 │   │   ├── scripts/
-│   │   │   ├── main.py           # main data collection script
-│   │   │   ├── flir.py           # operates flir thermal captures
-│   │   │   ├── phytos31.py       # operates phytos31 leaf wetness captures
-│   │   │   └── sht31.py          # operates two SHT31 temp/humidity sensors (ambient: I2C addr 0x44 | flir housing: I2C addr 0x45)
-│   │   │  
-│   │   └── config/
-│   │
-│   └── .pyenv/
-│       └── versions/
-│           └── deployment_env/
-│
-├── /mnt/
-│   └── ssd/
-│       └── field-logger/
-│           ├── environmental/   
-│           │     └── .json      # phytos and sht31 data
-│           └── flir/
-│                ├── .tiff       # thermal images 
-│                └── .json       # constants and variables for calculating deg C 
-│
-├── /etc/
-│   └── systemd/
-│       └── system/
-│           ├── data-logger.service      # runs main.py data acquisition script automatically on boot 
-│           ├── nextcloud-sync.service   # synchronizes ssd with Nextcloud using rclone  
-│           └── nextcloud-sync.timer     # automatically schedules and triggers Nextcloud synch service at configured intervals
-│
-└── Data Synchronization
-    └── rclone → Nextcloud
+│   │   │   ├── main.py           # main data collection script    
+│   │   │   ├── flir.py           # operates flir thermal captures    
+│   │   │   ├── phytos31.py       # operates phytos31 leaf wetness captures    
+│   │   │   └── sht31.py          # operates two SHT31 temp/humidity sensors (ambient: I2C addr 0x44 | flir housing: I2C addr 0x45)    
+│   │   │      
+│   │   └── config/    
+│   │    
+│   └── .pyenv/    
+│       └── versions/    
+│           └── deployment_env/    
+│     
+├── /mnt/    
+│   └── ssd/    
+│       └── field-logger/    
+│           ├── environmental/       
+│           │     └── .json      # phytos and sht31 data     
+│           └── flir/     
+│                ├── .tiff       # thermal images     
+│                └── .json       # constants and variables for calculating deg C     
+│    
+├── /etc/    
+│   └── systemd/    
+│       └── system/    
+│           ├── data-logger.service      # runs main.py data acquisition script automatically on boot     
+│           ├── nextcloud-sync.service   # synchronizes ssd with Nextcloud using rclone      
+│           └── nextcloud-sync.timer     # automatically schedules and triggers Nextcloud synch service at configured intervals    
+│    
+└── Data Synchronization    
+    └── rclone → Nextcloud    
 
-Campbell CR310
+Campbell CR310    
 └── thermistor_reference_panel.CR300          # campbell control script 
 
 ## 4. Pi Python Environment and Dependencies
