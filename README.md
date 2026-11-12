@@ -12,8 +12,8 @@ The following table summarizes the hardware components connected to the Raspberr
 |---|---|---|---|
 | Single-board computer | Raspberry Pi 5 | — | Data acquisition controller |
 | Storage | NVMe SSD | PCIe | Local data storage |
-| Thermal camera | FLIR A615 | Ethernet/USB | Thermal imagery acquisition |
-| Temperature/humidity sensors | 2 SHT31 | I2C | Ambient and FLIR housing temp./humidity measurements |
+| Thermal camera | FLIR A615 | Ethernet | Thermal imagery acquisition |
+| Temperature/humidity sensors | 2 SHT31 | I2C | Temperature and humidity measurements (ambient / camera housing)|
 | Leaf wetness sensor | PHYTOS 31 | Analog via ADS1115 | Leaf wetness monitoring |
 | Analog-to-digital converter (ADC) | ADS1115 | I2C | Analog voltage acquisition |
 | Thermistor reference panel | 4 Amphenol EC95G104VN thermistors | Campbell CR310 data logger | temperature reference measurements
@@ -40,17 +40,16 @@ The following table summarizes the hardware components connected to the Raspberr
 ```
 
 ## 3. Software Architecture 
+```
 Raspberry Pi 5    
 │    
 ├── /home/scott/    
 │   ├── field-logger/    
-│   │   ├── scripts/     
-│   │   │   ├── main.py           # main data collection script    
-│   │   │   ├── flir.py           # operates flir thermal captures    
-│   │   │   ├── phytos31.py       # operates phytos31 leaf wetness captures    
-│   │   │   └── sht31.py          # operates SHT31 temp/humidity sensors (ambient: I2C addr 0x44 | flir housing: I2C addr 0x45)    
-│   │   │      
-│   │   └── config/    
+│   │   └── scripts/     
+│   │       ├── main.py           # main data collection script    
+│   │       ├── flir.py           # operates flir thermal captures    
+│   │       ├── phytos31.py       # operates phytos31 leaf wetness captures    
+│   │       └── sht31.py          # operates SHT31 temp/humidity sensors    
 │   │    
 │   └── .pyenv/    
 │       └── versions/    
@@ -76,7 +75,8 @@ Raspberry Pi 5
     └── rclone → Nextcloud    
 
 Campbell CR310    
-└── thermistor_reference_panel.CR300          # campbell control script 
+└── thermistor_reference_panel.CR300     # campbell control script 
+```
 
 ## 4. Python Environment and Dependencies
 ===== PYTHON ENVIRONMENT =====    
