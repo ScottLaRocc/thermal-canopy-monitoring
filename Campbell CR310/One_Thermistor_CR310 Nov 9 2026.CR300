@@ -1,0 +1,65 @@
+'CR310 - single Amphenol EC95G104VN thermistor, half bridge with 1k reference resistor
+
+'Wiring
+'Thermistor red   -> VX1
+'Thermistor black -> SE1 (the terminal marked 1 / H of differential pair 1)
+'1k precision resistor from SE1 -> ground (the analog ground terminal next to SE1)
+
+'Declare Variables and Units
+Public BattV
+Public PTemp_C
+Public ThermRatio          'V measured / V excitation, from BrHalf
+Public ThermRes            'Thermistor resistance, ohms
+Public ThermTemp_C         'Thermistor temperature, deg C
+
+'Reference (fixed) resistor, ohms
+Const Rref = 1000
+
+'Steinhart-Hart coefficients (first set from the CR1000 multiplexer program)
+Const SH_A = 0.0014890258100333767
+Const SH_B = 0.00012148772112920084
+Const SH_C = 3.0556633951101875e-07
+
+Units BattV = Volts
+Units PTemp_C = Deg C
+Units ThermRatio = V/V
+Units ThermRes = Ohms
+Units ThermTemp_C = Deg C
+
+'Define Data Tables
+DataTable(Table1_1min_Thermist, True, -1)
+  DataInterval(0, 1, Min, 10)   'Store data every 1 minute
+  Average(1, BattV, FP2, False)
+  Average(1, PTemp_C, FP2, False)
+  'Scans where the temperature is NAN are left out of the average
+  Average(1, ThermTemp_C, IEEE4, ThermTemp_C = NAN)
+  Sample(1, ThermRes, IEEE4)
+  Sample(1, ThermRatio, IEEE4)
+EndTable
+
+'Main Program
+BeginProg
+  'Main scan every 15 seconds
+  Scan(15, Sec, 0, 0)
+    'Datalogger battery voltage
+    Battery(BattV)
+    'Datalogger panel temperature
+    PanelTemp(PTemp_C, 60)
+
+    'Half bridge: excite VX1 with 2500 mV, measure SE1 across the 1k resistor
+    'Result is the ratio V1/Vx = Rref / (Rtherm + Rref)
+    BrHalf(ThermRatio, 1, mV2500, 1, VX1, 1, 2500, False, 500, 60, 1, 0)
+
+    If ThermRatio <= 0 OR ThermRatio >= 1 Then
+      'Open circuit, short circuit or bad reading
+      ThermRes = NAN
+      ThermTemp_C = NAN
+    Else
+      ThermRes = Rref * (1 - ThermRatio) / ThermRatio
+      ThermTemp_C = 1 / (SH_A + SH_B * LN(ThermRes) + SH_C * (LN(ThermRes))^3) - 273.15
+    EndIf
+
+    'Store averaged data every 1 minute
+    CallTable Table1_1min_Thermist
+  NextScan
+EndProg

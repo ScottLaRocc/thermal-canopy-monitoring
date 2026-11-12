@@ -1,0 +1,85 @@
+'Historic Hat Ranch Program from ClimaVue weather station, apogee, net-radiometer and thermistors
+'Last Updated: July 6 2024
+'Author: Jen L. Diehl
+
+'Wiring
+
+'Multiplexer to CR1000
+'Com odd L to EX3
+'Com odd H to H8 with precision resistor off it to ground (same port)
+'12V to powerboat 12V
+'Clock to C3
+'Res to C4
+'G to G
+
+'Thermistor 1
+'Black 1H
+'Red 1L
+
+'Declare Variables and Units
+Public BattV
+Public PTemp_C
+Public ThermistorDataVolt(32)
+
+' Variables for multiplexer readings
+Public ThermistorData(32) As Float ' Array to store readings from each thermistor
+Public LCount As Long ' Counter for multiplexer channels
+
+' Alias for multiplexer ports
+Const C4 = 4
+Const C3 = 3
+Const MuxEnablePort = C4 ' Multiplexer enable port
+Const MuxClockPort = C3 ' Multiplexer clock port
+
+' Steinhart-Hart coefficients for each thermistor 
+Public A(12)= {0.0014890258100333767,0.0007469164927461894,0.0014890258100333767,0.0007469164927461894,0.0014890258100333767,0.0007469164927461894,0.0014890258100333767,0.0007469164927461894,0.0014890258100333767,0.0007469164927461894,0.0014890258100333767,0.0007469164927461894}
+Public Be(12) = {0.00012148772112920084,0.00021867579435176749,0.00012148772112920084,0.00021867579435176749,0.00012148772112920084,0.00021867579435176749,0.00012148772112920084,0.00021867579435176749,0.00012148772112920084,0.00021867579435176749,0.00012148772112920084,0.00021867579435176749}
+Public C(12) = {3.0556633951101875e-07,5.7045681851716875e-08,3.0556633951101875e-07,5.7045681851716875e-08,3.0556633951101875e-07,5.7045681851716875e-08,3.0556633951101875e-07,5.7045681851716875e-08,3.0556633951101875e-07,5.7045681851716875e-08,3.0556633951101875e-07,5.7045681851716875e-08}
+
+Units BattV=Volts
+Units PTemp_C=Deg C
+
+Units ThermistorData=Deg C
+
+
+'Define Data Tables
+DataTable(Table1_1min_Thermist, True, -1)
+    DataInterval(0, 1, Min, 10) ' Store data every 1 minute
+    Average(1, BattV, FP2, False)
+    Average(1, PTemp_C, FP2, False)
+    Average(32, ThermistorData(), FP2, False) ' Average thermistor data
+EndTable
+
+'Main Program
+BeginProg
+    ' Main Scan for multiplexer and thermistors every 15 seconds
+    Scan(15, Sec, 0, 0)
+        ' Default CR1000 Datalogger Battery Voltage measurement 'BattV'
+        Battery(BattV)
+        ' Default CR1000 Datalogger Clock Temperature measurement 'PTemp_C'
+        PanelTemp(PTemp_C,_60Hz)
+
+        PortSet(MuxEnablePort, 1)
+        Delay(0, 150, mSec)
+        LCount = 1
+        SubScan(0, uSec, 32) ' Thermistors for first 21 channels
+            PulsePort(MuxClockPort, 10000)
+            ' Measure thermistor voltage using BrHalf instruction
+            BrHalf(ThermistorDataVolt(LCount),1,mV2500,15,EX3,1,2500,True,0,250,1,0)
+            Dim R As Float
+            Dim T As Float
+            If ThermistorDataVolt(LCount) = 0 Then
+              T = -999
+            Else
+              R = (1000 * (1-ThermistorDataVolt(LCount))) / ThermistorDataVolt(LCount)   '1k precision resistor
+              T = 1 / (A(LCount) + Be(LCount) * LN(R) + C(LCount) * (LN(R))^3) - 273.15 ' Convert to Celsius 
+            End If
+            ThermistorData(LCount) = T
+            LCount = LCount + 1
+        NextSubScan
+        PortSet(MuxEnablePort, 0)
+        ' Store averaged data every 1 minute
+        CallTable Table1_1min_Thermist
+    NextScan
+
+EndProg

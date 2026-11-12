@@ -1,0 +1,15 @@
+[Unit]
+Description=Tambopata Data Logger Controller
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=scott
+WorkingDirectory=/home/scott/field-logger/scripts
+ExecStart=/home/scott/.pyenv/versions/deployment_env/bin/python -u /home/scott/field-logger/scripts/main.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
