@@ -46,17 +46,21 @@ Raspberry Pi 5
 ├── /home/scott/    
 │   ├── field-logger/    
 │   │   └── scripts/     
-│   │       ├── main.py           # main data collection script    
-│   │       ├── flir.py           # operates flir thermal captures    
-│   │       ├── phytos31.py       # operates phytos31 leaf wetness captures    
-│   │       └── sht31.py          # operates SHT31 temp/humidity sensors    
+│   │       ├── main.py             # main data collection script    
+│   │       ├── flir.py             # operates flir thermal captures    
+│   │       ├── phytos31.py         # operates phytos31 leaf wetness captures    
+│   │       ├── sht31.py            # operates SHT31 temp/humidity sensors  
+│   │       ├── sync-nextcloud.sh   # synchronizes ssd with Nextcloud using rclone     
+│   │       ├── monitor-station-temp.py  # monitors CPU and FLIR housing temperature
+│   │       └── testing/  
 │   │    
 │   └── .pyenv/    
 │       └── versions/    
 │           └── deployment_env/    
 │     
 ├── /mnt/    
-│   └── ssd/    
+│   └── ssd/      
+│       ├── testing/      
 │       └── field-logger/    
 │           ├── environmental/       
 │           │     └── .json      # phytos and sht31 data     
@@ -67,10 +71,12 @@ Raspberry Pi 5
 ├── /etc/    
 │   └── systemd/    
 │       └── system/    
-│           ├── data-logger.service      # runs main.py data acquisition script automatically on boot     
-│           ├── nextcloud-sync.service   # synchronizes ssd with Nextcloud using rclone      
-│           └── nextcloud-sync.timer     # automatically schedules and triggers Nextcloud synch service at configured intervals    
-│    
+│           ├── data-logger.service      # runs main.py data acquisition script automatically 
+│           ├── nextcloud-sync.service   # automates Nextcloud sync    
+│           ├── nextcloud-sync.timer     # automatically schedules sync (every 30 min)
+│           ├── station-monitor.service  # automatically monitors cpu & FLIR temperature
+│           └── station-monitor.timer    # schedules station-monitor.service (every 10 min)
+│     
 └── Data Synchronization    
     └── rclone → Nextcloud    
 
@@ -109,4 +115,3 @@ spinnaker-python @ file:///home/scott/Downloads/spinnaker_python-4.3.0.189-cp310
 sysv_ipc==1.2.0      
 toml==0.10.2     
 typing_extensions==4.16.0    
-
