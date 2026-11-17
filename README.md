@@ -51,16 +51,15 @@ Raspberry Pi 5
 │   │       ├── phytos31.py         # operates phytos31 leaf wetness captures    
 │   │       ├── sht31.py            # operates SHT31 temp/humidity sensors  
 │   │       ├── sync-nextcloud.sh   # synchronizes ssd with Nextcloud using rclone     
-│   │       ├── monitor-station-temp.py  # monitors CPU and FLIR housing temperature
-│   │       └── testing/  
+│   │       └── monitor-station-temp.py  # monitors CPU and FLIR housing temperature
+│   │        
 │   │    
 │   └── .pyenv/    
 │       └── versions/    
 │           └── deployment_env/    
 │     
 ├── /mnt/    
-│   └── ssd/      
-│       ├── testing/      
+│   └── ssd/          
 │       └── field-logger/    
 │           ├── environmental/       
 │           │     └── .json      # phytos and sht31 data     
