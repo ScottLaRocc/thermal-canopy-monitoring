@@ -7,31 +7,13 @@ from zoneinfo import ZoneInfo
 import sht31
 import phytos31
 import flir
-
+import storage_manager
 
 # ------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------
 
-BASE_DIR = "/mnt/ssd/field-logger"
-
-ENVIRONMENTAL_DIR = os.path.join(
-    BASE_DIR,
-    "environmental"
-)
-
-FLIR_DIR = os.path.join(
-    BASE_DIR,
-    "flir"
-)
-
 LOCAL_TIMEZONE = ZoneInfo("America/Lima")
-
-
-# Create storage directories
-os.makedirs(ENVIRONMENTAL_DIR, exist_ok=True)
-os.makedirs(FLIR_DIR, exist_ok=True)
-
 
 # ------------------------------------------------------------------
 # Timing
@@ -67,6 +49,13 @@ def acquire():
     Perform one complete acquisition cycle.
     """
 
+    # get storage location from storage manager
+    storage = storage_manager.get_active_storage()
+    
+    # set storage location directories
+    ENVIRONMENTAL_DIR = storage["environmental"]
+    FLIR_DIR = storage["flir"]
+
     observation_time = datetime.now(LOCAL_TIMEZONE)
 
     observation_id = observation_time.strftime(
@@ -88,6 +77,15 @@ def acquire():
     record = {
         "observation_id": observation_id,
         "timestamp": observation_time.isoformat(),
+        "storage": {
+            "active_device": storage["active_device"],
+            "fallback_active": storage["fallback_active"],
+            "ssd_mounted": storage["ssd_mounted"],
+            "ssd_healthy": storage["ssd_healthy"],
+            "ssd_available_gb": storage["ssd_available_gb"],
+            "sd_available_gb": storage["sd_available_gb"],
+            "sd_used_gb": storage["sd_used_gb"]
+        }
     }
 
     # --------------------------------------------------------------
@@ -176,13 +174,11 @@ def acquire():
 # ------------------------------------------------------------------
 # Main loop
 # ------------------------------------------------------------------
-
 def main():
 
     print("Field logger starting...")
-    print(f"Base directory: {BASE_DIR}")
-    print(f"Environmental data: {ENVIRONMENTAL_DIR}")
-    print(f"FLIR data: {FLIR_DIR}")
+    print(f"Primary SSD directory: {storage_manager.SSD_DATA_DIR}")
+    print(f"SD fallback directory: {storage_manager.SD_DATA_DIR}")
     print("Acquisition interval: 30 minutes")
 
     while True:

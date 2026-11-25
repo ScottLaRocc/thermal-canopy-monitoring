@@ -50,16 +50,19 @@ Raspberry Pi 5
 │   │       ├── flir.py             # operates flir thermal captures    
 │   │       ├── phytos31.py         # operates phytos31 leaf wetness captures    
 │   │       ├── sht31.py            # operates SHT31 temp/humidity sensors  
+│   │       ├── storage_manager.py  # manages storage location (prefer ssd, sd backup)  
 │   │       ├── sync-nextcloud.sh   # synchronizes ssd with Nextcloud using rclone     
-│   │       └── monitor-station-temp.py  # monitors CPU and FLIR housing temperature
-│   │        
-│   │    
-│   └── .pyenv/    
+│   │       └── monitor.py          # tracks hardware temp., ssd/sd status, last data coll. 
+│   │                               # & emails alerts   
+│   │                               
+│   ├── field-logger-backup/        # backup SD storage location in case of SSD loss
+│   │ 
+│   └── .pyenv/                     # virtual environment 
 │       └── versions/    
 │           └── deployment_env/    
 │     
 ├── /mnt/    
-│   └── ssd/          
+│   └── ssd/                     # mounted SSD location 
 │       └── field-logger/    
 │           ├── environmental/       
 │           │     └── .json      # phytos and sht31 data     

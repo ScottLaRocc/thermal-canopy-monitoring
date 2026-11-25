@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Field Station Monitor Every 10 Minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+Unit=station-monitor.service
+
+[Install]
+WantedBy=timers.target

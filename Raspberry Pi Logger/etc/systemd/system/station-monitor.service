@@ -1,0 +1,10 @@
+[Unit]
+Description=Tambopata Field Station Temperature Monitor
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=scott
+WorkingDirectory=/home/scott/field-logger
+EnvironmentFile=/etc/station-monitor.env
+ExecStart=/usr/bin/python3 /home/scott/field-logger/scripts/monitor.py

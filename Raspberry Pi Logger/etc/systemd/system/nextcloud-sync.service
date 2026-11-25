@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync field logger data to Nextcloud
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=scott
+ExecStart=/home/scott/field-logger/scripts/sync-nextcloud.sh
