@@ -103,17 +103,47 @@ def roi_stats(temp_c, raw, roi):
 # ------------------------------------------------------------------
 
 def build_parser():
-    project_dir = Path(__file__).resolve().parent.parent
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--raw-dir", type=Path, default=project_dir / "images" / "raw")
-    ap.add_argument("--out-dir", type=Path, default=project_dir / "images" / "processed_calibration")
-    ap.add_argument("--window-transmission", type=float, default=1.0,
-                    help="Enclosure window transmission (0-1). Default 1 = no window.")
-    ap.add_argument("--t-window", type=float,
-                    help="Window temperature, degC. Required if window transmission < 1.")
-    ap.add_argument("--roi", type=int, nargs=4, action="append", metavar=("X", "Y", "W", "H"),
-                    help="Region of interest in pixels; may be given several times.")
+    ap = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    ap.add_argument(
+        "--raw-dir",
+        type=Path,
+        required=True,
+        help="Directory containing raw FLIR TIFFs and corresponding JSON metadata."
+    )
+
+    ap.add_argument(
+        "--out-dir",
+        type=Path,
+        required=True,
+        help="Directory where processed TIFFs, JSONs, and CSV summary will be saved."
+    )
+
+    ap.add_argument(
+        "--window-transmission",
+        type=float,
+        default=1.0,
+        help="Enclosure window transmission (0-1). Default 1 = no window."
+    )
+
+    ap.add_argument(
+        "--t-window",
+        type=float,
+        help="Window temperature, degC. Required if window transmission < 1."
+    )
+
+    ap.add_argument(
+        "--roi",
+        type=int,
+        nargs=4,
+        action="append",
+        metavar=("X", "Y", "W", "H"),
+        help="Region of interest in pixels; may be given several times."
+    )
+
     return ap
 
 

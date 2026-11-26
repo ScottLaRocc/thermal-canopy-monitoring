@@ -25,18 +25,19 @@ The following table summarizes the hardware components connected to the Raspberr
               +--------+--------+--------------+     
               |                 |              |      
         12V-5V converter    FLIR A615     Campbell CR310     
-              | (USB-C)                        |    
+           (USB-C)                             | 
+              |                                |    
           Raspberry Pi 5                  +----+---------+     
               |                           |              |        
        +------+------+                Thermistors (4)   (Other tower sensors)       
        |             |      
-      I2C          Ethernet     
+      I2C         Ethernet     
        |             |     
    +---+---+      FLIR A615    
    |       |     
    SHT31   ADS1115      
-           | (15 m cable, trs 3.5mm jack w breakout)        
-        PHYTOS31        
+           | 
+           PHYTOS31        
 ```
 
 ## 3. Software Architecture 
@@ -57,9 +58,11 @@ Raspberry Pi 5
 │   │                               
 │   ├── field-logger-backup/        # backup SD storage location in case of SSD loss
 │   │ 
-│   └── .pyenv/                     # virtual environment 
-│       └── versions/    
-│           └── deployment_env/    
+│   ├── .pyenv/                     # virtual environment 
+│   │    └── versions/    
+│   │        └── deployment_env/    
+│   │
+│   └── requirements.txt
 │     
 ├── /mnt/    
 │   └── ssd/                     # mounted SSD location 
@@ -86,34 +89,52 @@ Campbell CR310
 └── thermistor_reference_panel.CR300     # campbell control script 
 ```
 
+## 4. Normal Operation: 
+
+The data logger operates autonomously once the Raspberry Pi boots. Systemd manages the startup and scheduling of the acquisition, monitoring, and synchronization processes. Automated processes are controlled by `.service` and `.timer` scripts, which initialize automatically on boot. 
+
+### 4.1 Data Acquisition (Every 30 Minutes)
+Controlled by `data-logger.service`
+
+Triggers `main.py` at each hour (:00) and half-hour (:30) time stamp from pi's onboard clock. 
+
+`main.py` collects:
+
+1. **Temperature and humidity measurements:** calls `sht31.py` to collect temperature and relative humidity from the SHT31 sensors (ambient and FLIR housing). 
+
+2. **Leaf wetness measurements:** calls `phytos31.py` to read the PHYTOS31 sensor voltage.
+
+3. **Thermal imagery:** calls `flir.py` to collect thermal image and metadata from the FLIR A615. 
+
+4. **Storage location:** calls `storage-manager.py` to check for connection and available space in the SSD. If connection to SSD is interrupted, sets the storage location to onboard SD. 
+
+Data from sensors are stored as .json under `/environmental/`, and data from FLIR camera as .tiff and .json metadata under `/flir/`. 
+
+- A modular design allows `main.py` to execute successfully if one sensor or storage location is compromised. 
+
+### 4.2 Cloud Synchronization (Every 30 minutes)
+`nextcloud-sync.timer` and `nextcloud-sync.service` execute `sync-nextcloud.sh`. 
+
+- Uses rclone to synchronize the pi's local storage directories (SSD & SD) with cloud storage in Nextcloud. 
+
+### 4.3 System Monitoring (Every 10 Minutes)
+`station-monitor.timer` and `station-monitor.service` execute `monitor.py`, which checks:
+- Raspberry Pi CPU temperature.
+- FLIR housing temperature and humidity.
+- Ambient temperature and relative humidity.
+- SSD mounting and SD card storage status.
+- Time elapsed since the last successful data collection.
+
+Email notifications are sent if predefined warning or critical thresholds are exceeded for each monitoring variable, and when the system returns to normal. 
+
+
 ## 4. Python Environment and Dependencies
 ===== PYTHON ENVIRONMENT =====    
 Environment: /home/scott/.pyenv/versions/3.10.13/envs/deployment_env    
 Python executable: /home/scott/.pyenv/shims/python     
 Python version: Python 3.10.13    
 
-===== PYENV =====    
-deployment_env (set by PYENV_VERSION environment variable)
+Use: `pyenv activate deployment_env`
 
-===== INSTALLED PACKAGES =====    
-Adafruit-Blinka==8.64.0    
-adafruit-circuitpython-ads1x15==3.0.5    
-adafruit-circuitpython-busdevice==5.2.17    
-adafruit-circuitpython-connectionmanager==3.1.8    
-adafruit-circuitpython-requests==4.1.17    
-adafruit-circuitpython-sht31d==2.3.31    
-adafruit-circuitpython-typing==1.12.3    
-Adafruit-PlatformDetect==3.89.1    
-Adafruit-PureIO==1.1.11    
-binho-host-adapter==0.1.6    
-lgpio==0.2.2.0    
-numpy==1.26.4    
-pyftdi==0.57.2    
-pyserial==3.5    
-pyusb==1.3.1    
-rpi-ws281x==5.0.0    
-RPi.GPIO==0.7.1    
-spinnaker-python @ file:///home/scott/Downloads/spinnaker_python-4.3.0.189-cp310-cp310-linux_aarch64.whl     
-sysv_ipc==1.2.0      
-toml==0.10.2     
-typing_extensions==4.16.0    
+Requirements list: `~/field-logger/requirements.txt`
+

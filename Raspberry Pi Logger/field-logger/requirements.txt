@@ -1,0 +1,21 @@
+Adafruit-Blinka==8.64.0
+adafruit-circuitpython-ads1x15==3.0.5
+adafruit-circuitpython-busdevice==5.2.17
+adafruit-circuitpython-connectionmanager==3.1.8
+adafruit-circuitpython-requests==4.1.17
+adafruit-circuitpython-sht31d==2.3.31
+adafruit-circuitpython-typing==1.12.3
+Adafruit-PlatformDetect==3.89.1
+Adafruit-PureIO==1.1.11
+binho-host-adapter==0.1.6
+lgpio==0.2.2.0
+numpy==1.26.4
+pyftdi==0.57.2
+pyserial==3.5
+pyusb==1.3.1
+rpi-ws281x==5.0.0
+RPi.GPIO==0.7.1
+spinnaker-python @ file:///home/scott/Downloads/spinnaker_python-4.3.0.189-cp310-cp310-linux_aarch64.whl
+sysv_ipc==1.2.0
+toml==0.10.2
+typing_extensions==4.16.0
